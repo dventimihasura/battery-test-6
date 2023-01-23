@@ -2,13 +2,14 @@
 
 set-x
 
+export N=10
 export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
 export PGHOST=$(curl -s -H "Authorization: Bearer ${DIGITALOCEAN_TOKEN}" "https://api.digitalocean.com/v2/droplets/${DATABASEID}" | jq -r '.droplet.networks.v4[]|select(.type=="public").ip_address')
 export PGUSER=postgres
 export PGPORT=5432
 export PGDATABASE=postgres
 export PGPASSWORD=postgrespassword
-docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL=postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE} -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
+docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}" -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
 sleep 10
 cat <<EOF | psql
 select format('create table if not exists test_%1\$s (id uuid primary key default gen_random_uuid(), name text)', generate_series(1, ${N}));
