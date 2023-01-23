@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
-set-x
+set -x
 
 export N=10
 export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
