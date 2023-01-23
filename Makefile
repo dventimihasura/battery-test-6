@@ -6,6 +6,12 @@ N:=10
 .PHONY: default
 
 default:
+	DATABASEID=$$(doctl compute droplet create --wait --region sfo3 --ssh-keys $(KEYID) --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "$$HOSTNAME-db-2")
+	export PGHOST=$$(curl -s -H "Authorization: Bearer $(DIGITALOCEAN_TOKEN)" "https://api.digitalocean.com/v2/droplets/$$DATABASEID" | jq -r '.droplet.networks.v4[]|select(.type=="public").ip_address')
+	export PGUSER=postgres
+	export PGPORT=5432
+	export PGDATABASE=postgres
+	export PGPASSWORD=postgrespassword
 	docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL=postgres://$${PGUSER}:$${PGPASSWORD}@$${PGHOST}:$${PGPORT}/$${PGDATABASE} -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
 	sleep 10
 	cat <<EOF | psql
@@ -22,3 +28,4 @@ default:
 	pgbench -n -T10 -j10 -c10 -Mprepared -f test.sql >> pgbench.log
 	k6 run -u50 -d10s test.js --summary-export k6.log
 	docker ps -aq | xargs docker rm -f
+	curl -s -H "Authorization: Bearer ${DIGITALOCEAN_TOKEN}" -X DELETE "https://api.digitalocean.com/v2/droplets/\$DATABASEID"
