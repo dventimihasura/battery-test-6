@@ -3,7 +3,10 @@ SHELL=bash
 N:=10
 
 .ONESHELL:
-.PHONY: default
+.PHONY: default alternate
+
+alternate:
+	bash test.bash
 
 default:
 	DATABASEID=$$(doctl compute droplet create --wait --region sfo3 --ssh-keys $(KEYID) --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "$$HOSTNAME-db-2")
