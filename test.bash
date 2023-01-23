@@ -3,6 +3,7 @@
 set -x
 
 export N=10
+export CLUSTERID=$(curl -s -H "Authorization: Bearer ${DIGITALOCEAN_TOKEN}" "https://api.digitalocean.com/v2/databases" | jq -r '.databases[]|select(.name=="hasura-battery-test").id')
 export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
 export PGHOST=$(curl -s -H "Authorization: Bearer ${DIGITALOCEAN_TOKEN}" "https://api.digitalocean.com/v2/droplets/${DATABASEID}" | jq -r '.droplet.networks.v4[]|select(.type=="public").ip_address')
 export PGUSER=postgres
