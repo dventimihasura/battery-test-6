@@ -20,10 +20,8 @@ docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL="postgres://${PGUSER}:${
 sleep 10
 curl -s -H 'Content-type: application/json' --data-binary @config.json "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
 seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
-seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8080/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
-pgbench -n -T10 -j10 -c10 -Msimple -f test.sql >> pgbench.log
-pgbench -n -T10 -j10 -c10 -Mextended -f test.sql >> pgbench.log
-pgbench -n -T10 -j10 -c10 -Mprepared -f test.sql >> pgbench.log
-k6 run -u50 -d10s test.js --summary-export k6.log
-docker ps -aq | xargs docker rm -f
-doctl compute droplet delete -f ${DATABASEID}
+seq 10 | head -n1 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8080/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
+pgbench -n -T10 -f test.sql > pgbench.log
+k6 run -u1 -d10s test.js --summary-export k6.log
+# docker ps -aq | xargs docker rm -f
+# doctl compute droplet delete -f ${DATABASEID}
