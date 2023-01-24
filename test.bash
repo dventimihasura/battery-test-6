@@ -16,7 +16,8 @@ select format('create table if not exists test_%1\$s (id uuid primary key defaul
 select format('insert into test_%1\$s (name) select name from (select generate_series(1, %2\$s) id, repeat(md5(random()::text), 2) name) sample', generate_series(1, ${N}), ${N});
 \gexec
 EOF
-docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}" -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
+docker-compuse up -d -e PGHOST=${PGHOST} -e PGPORT=${PGPORT} -e PGUSER=${PGUSER} -e PGDATABASE=${PGDATABASE} -e PGPASSWORD=${PGPASSWORD}
+# docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}" -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
 sleep 10
 curl -s -H 'Content-type: application/json' --data-binary @config.json "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
 seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
