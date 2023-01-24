@@ -3,7 +3,7 @@
 set -x
 
 export N=10
-export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
+export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${SSH_KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
 export PGHOST=$(doctl compute droplet get ${DATABASEID} -o json | jq -r '.[]|.networks.v4[]|select(.type=="public").ip_address')
 export PGUSER=postgres
 export PGPORT=5432
