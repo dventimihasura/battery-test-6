@@ -3,9 +3,12 @@ services:
   graphql-engine:
     image: hasura/graphql-engine:latest
     restart: always
-    network_mode: "host"
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+networks:
+  default:
+    driver: overlay
+    external: true
