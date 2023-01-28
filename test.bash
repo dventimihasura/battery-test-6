@@ -7,7 +7,7 @@ set -m				# Turn on job control.
 
 # Set up the environment.
 
-export N=10
+: ${N:=10}
 
 # Start the database.
 
@@ -45,11 +45,11 @@ curl -s -H 'Content-type: application/json' --data-binary @config.json "http://1
 
 # Track the tables.
 
-seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8081/v1/metadata" | jq -r '.'
+seq ${N} | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8081/v1/metadata" | jq -r '.'
 
 # Generate the GraphQL to SQL translations.
 
-seq 10 | head -n1 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8081/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
+seq ${N} | head -n1 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8081/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
 
 # Run the pgbench load test scripts.
 
@@ -65,8 +65,8 @@ cat test_1.json | jq -r '"graphql-engine-1: \(.metrics.iterations)"' > k6.log
 
 # Stop the services.
 
-# docker-compose down
+docker-compose down
 
 # Stop the database.
 
-# doctl compute droplet delete -f ${DATABASEID}
+doctl compute droplet delete -f ${DATABASEID}
