@@ -1,1 +1,7 @@
 scratch.sql
+k6.log
+*.log
+test.sql
+*.sql
+test_1.json
+*.json

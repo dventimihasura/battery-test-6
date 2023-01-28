@@ -1,14 +1,12 @@
 version: '3.6'
 services:
-  graphql-engine:
+  graphql-engine-1:
     image: hasura/graphql-engine:latest
+    ports:
+      - "8081:8080"
     restart: always
     environment:
       HASURA_GRAPHQL_DATABASE_URL: postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}
       HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
       HASURA_GRAPHQL_DEV_MODE: "true"
       HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
-networks:
-  default:
-    driver: overlay
-    external: true

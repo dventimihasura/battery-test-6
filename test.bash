@@ -36,20 +36,20 @@ EOF
 
 # Start the services.
 
-docker run -d --net=host -e HASURA_GRAPHQL_DATABASE_URL="postgres://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}" -e HASURA_GRAPHQL_ENABLE_CONSOLE=true hasura/graphql-engine:latest
+docker-compose up -d
 
 # Apply the Hasura metadata config, after the health check passes.
 
-while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://localhost:8082/healthz)" != "200" ]]; do sleep 5; done
-curl -s -H 'Content-type: application/json' --data-binary @config.json "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
+while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' http://127.0.0.1:8081/healthz)" != "200" ]]; do sleep 5; done
+curl -s -H 'Content-type: application/json' --data-binary @config.json "http://127.0.0.1:8081/v1/metadata" | jq -r '.'
 
 # Track the tables.
 
-seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8080/v1/metadata" | jq -r '.'
+seq 10 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8081/v1/metadata" | jq -r '.'
 
 # Generate the GraphQL to SQL translations.
 
-seq 10 | head -n1 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8080/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
+seq 10 | head -n1 | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"query":{"query":"{test_{} {name}}"}}' "http://127.0.0.1:8081/v1/graphql/explain" | jq -r '.[]|.sql|"\(.);"' > test.sql
 
 # Run the pgbench load test scripts.
 
@@ -57,16 +57,16 @@ pgbench -n -T10 -c10 -j10 -f test.sql > pgbench.log
 
 # Run the k6 load test scripts.
 
-k6 run -u1 -d10s test.js --summary-export k6.log
+k6 run -q -u1 -d10s test_1.js --summary-export test_1.json
 
 # Extract the relevant metrics into a log file.
 
-cat test_1.json | jq -r '"graphql-engine-1: \(.metrics.http_req_duration)"' >> k6.log
+cat test_1.json | jq -r '"graphql-engine-1: \(.metrics.iterations)"' > k6.log
 
 # Stop the services.
 
-docker ps -aq | xargs docker rm -f
+# docker-compose down
 
 # Stop the database.
 
-doctl compute droplet delete -f ${DATABASEID}
+# doctl compute droplet delete -f ${DATABASEID}
