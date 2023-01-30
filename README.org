@@ -1,7 +1,7 @@
 * What
 
 This repository provides a self-contained bench-marking load-test
-script for Hasura.  It addresses the following question.
+script for [[https://hasura.io/][Hasura]].  It addresses the following question.
 
 #+begin_quote
 What is an estimate on the through-put of Hasura under load, under
@@ -37,16 +37,49 @@ Hasura.
 
 * How
 
+This repository comprises a [[file:docker-compose.yaml][docker-compose.yaml]] file to launch the
+System Under Test (SUT), a small bootstrap Hasura metadata file
+[[file:config.json][config.json]], a [[https://k6.io/][k6]] test script [[file:test_1.js][test_1.js]], and a Bash script
+[[file:test.bash][test.js]] which orchestrates the benchmark.
 
+The SUT defined by the [[file:docker-compose.yaml][docker-compose.yaml]] file has just one service.
+
+- graphql-engine-1 :: instance hosting a Hasura GraphQL API for a set
+  of tracked tables
+
+**NOTE**:  The [[file:config.json][config.json]] metadata file actually is superfluous and
+may be removed in a future version.
+
+- [ ] TODO: Remove the config.json file.
+
+The [[file:test_1.js][test_1.js]] script uses [[https://k6.io/][k6]] to query a random top-level field,
+corresponding to a random table.  The actual query, and the data that
+it should return, are very small.  The output is only an ~Int id~
+field and a ~String name~ field.
+
+The database tables and their data are generated programmatically.
+Consequently, the number of tables can be parameterized with the
+environment variable ~N~.
+
+**NOTE**:  Currently, while the number of tables and top-level GraphQL
+fields can be configured by the environment variable ~N~, that
+parameter currently is not captured in the data that are written to
+the output log files.
+
+- [ ] TODO: Capture the parameter ~N~ into the output log files.
+- [ ] TODO: Parameterize the width of the ~String name~ field.
+- [ ] TODO: Parameterize the volume of data generated into the tables.
+- [ ] TODO: Add periodic metadata reload operations to the test script.
+- [ ] TODO: parameterize the frequency of metadata reload operations.
 
 * Steps
 
 *** Local Testing
 
 1. Clone this repository.
-2. Install Docker and Docker Compose.
-3. Install k6.
-4. Install the DigitalOcean CLI.
+2. Install [[https://docs.docker.com/get-docker/][Docker]] and [[https://docs.docker.com/compose/install/][Docker Compose]].
+3. Install [[https://k6.io/docs/get-started/installation/][k6]].
+4. Install the [[https://docs.digitalocean.com/reference/doctl/how-to/install/][DigitalOcean CLI]].
 5. Run the test script.
 
    #+begin_src shell
@@ -58,8 +91,9 @@ Hasura.
 *** Remote Testing
 
 1. Clone the battery repository.
-2. Install the DigitalOcean CLI.
-3. Run the test harness Make target with the test script repository URL.
+2. Install the [[https://docs.digitalocean.com/reference/doctl/how-to/install/][DigitalOcean CLI]].
+3. Install [[https://www.gnu.org/software/make/][Make]].
+4. Run the test harness Make target with the test script repository URL.
 
    #+begin_src shell
      export DIGITALOCEAN_TOKEN= # Paste in your DigitalOcean API token.
@@ -67,3 +101,6 @@ Hasura.
      export GIT_URL=https://github.com/dventimihasura/battery-test-6.git
      make up
    #+end_src
+
+#  LocalWords:  SUT Hasura's config json TODO programmatically src
+#  LocalWords:  DigitalOcean KEYID
