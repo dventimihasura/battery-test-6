@@ -57,7 +57,7 @@ pgbench -n -T10 -c10 -j10 -f test.sql > pgbench.log
 
 # Run the k6 load test scripts.
 
-k6 run -q -u50 -d10s test_1.js --summary-export test_1.json
+k6 run -q -u100 -d10s test_1.js --summary-export test_1.json
 
 # Extract the relevant metrics into a log file.
 
