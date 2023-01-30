@@ -47,7 +47,7 @@ The SUT defined by the [[file:docker-compose.yaml][docker-compose.yaml]] file ha
 - graphql-engine-1 :: instance hosting a Hasura GraphQL API for a set
   of tracked tables
 
-**NOTE**:  The [[file:config.json][config.json]] metadata file actually is superfluous and
+*NOTE*:  The [[file:config.json][config.json]] metadata file actually is superfluous and
 may be removed in a future version.
 
 - [ ] TODO: Remove the config.json file.
@@ -61,7 +61,7 @@ The database tables and their data are generated programmatically.
 Consequently, the number of tables can be parameterized with the
 environment variable ~N~.
 
-**NOTE**:  Currently, while the number of tables and top-level GraphQL
+*NOTE*:  Currently, while the number of tables and top-level GraphQL
 fields can be configured by the environment variable ~N~, that
 parameter currently is not captured in the data that are written to
 the output log files.
