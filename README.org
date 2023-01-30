@@ -50,7 +50,7 @@ The SUT defined by the [[file:docker-compose.yaml][docker-compose.yaml]] file ha
 *NOTE*:  The [[file:config.json][config.json]] metadata file actually is superfluous and
 may be removed in a future version.
 
-- [ ] TODO: Remove the config.json file.
+- [ ] TODO: Remove the [[file:config.json][config.json]] file.
 
 The [[file:test_1.js][test_1.js]] script uses [[https://k6.io/][k6]] to query a random top-level field,
 corresponding to a random table.  The actual query, and the data that
