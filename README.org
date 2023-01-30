@@ -80,7 +80,7 @@ the output log files.
 2. Install [[https://docs.docker.com/get-docker/][Docker]] and [[https://docs.docker.com/compose/install/][Docker Compose]].
 3. Install [[https://k6.io/docs/get-started/installation/][k6]].
 4. Install the [[https://docs.digitalocean.com/reference/doctl/how-to/install/][DigitalOcean CLI]].
-5. Run the test script.
+5. Run the test script in the ~battery-test-6~ directory.
 
    #+begin_src shell
      export DIGITALOCEAN_TOKEN= # Paste in your DigitalOcean API token.
@@ -90,10 +90,11 @@ the output log files.
    
 *** Remote Testing
 
-1. Clone the battery repository.
+1. Clone the [[https://github.com/hasura/battery][battery]] repository.
 2. Install the [[https://docs.digitalocean.com/reference/doctl/how-to/install/][DigitalOcean CLI]].
 3. Install [[https://www.gnu.org/software/make/][Make]].
-4. Run the test harness Make target with the test script repository URL.
+4. Run the test harness Make target with the test script repository
+   URL in the ~battery~ directory.
 
    #+begin_src shell
      export DIGITALOCEAN_TOKEN= # Paste in your DigitalOcean API token.
