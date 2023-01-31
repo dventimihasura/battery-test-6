@@ -11,7 +11,7 @@ set -m				# Turn on job control.
 
 # Start the database.
 
-export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${SSH_KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "${HOSTNAME}-db-2")
+export DATABASEID=$(doctl compute droplet create --wait --region sfo3 --ssh-keys ${SSH_KEYID} --size "so-32vcpu-256gb" --image 125035426 --no-header --format "ID" "hasura-battery-test-${HOSTNAME}-db-2")
 
 # Get the database credentials.
 
@@ -57,7 +57,7 @@ pgbench -n -T10 -c10 -j10 -f test.sql > pgbench.log
 
 # Run the k6 load test scripts.
 
-k6 run -q -u50 -d10s test_1.js --summary-export test_1.json
+k6 run -q -u50 -d100s test_1.js --summary-export test_1.json
 
 # Extract the relevant metrics into a log file.
 
