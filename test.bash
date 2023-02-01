@@ -45,7 +45,7 @@ curl -s -H 'Content-type: application/json' --data-binary @config.json "http://1
 
 # Track the tables.
 
-seq ${N} | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8081/v1/metadata" | jq -r '.'
+seq ${N} | xargs -I{} curl -s -H 'Content-type: application/json' --data '{"type":"pg_track_table","args":{"source":"default","table":"test_{}"}}' "http://127.0.0.1:8081/v1/metadata" > /dev/null
 
 # Generate the GraphQL to SQL translations.
 
